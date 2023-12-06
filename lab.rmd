@@ -1,0 +1,96 @@
+---
+title: "LabFinal"
+output: html_document
+date: "2023-12-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+```{r}
+n_sim = 10000
+
+num_cust = 30
+
+age_group_prob = c(0.2,0.35,0.45)
+
+items_sold = c(10,20,5)
+
+total_items = integer(n_sim)
+
+for (i in 1:n_sim){
+  
+  num_customer = rpois(1,num_cust)
+
+  age_group = sample(0:2, num_customer , replace = TRUE , prob = age_group_prob)
+  
+  num_items = rpois(num_customer , items_sold[age_group+1])
+  
+  total_items[i] = sum(num_items)
+  
+  
+}
+
+exceeds_350 = mean(total_items>350)
+
+exceeds_350
+
+```
+```{r}
+install.packages("ggplot2")
+library(ggplot2)
+  
+```
+```{r}
+df = as.data.frame(total_items)
+
+p = ggplot(df, aes(x=total_items)) + geom_histogram(binwidth = 1, color="skyblue", fill="white")+ labs(x="Total items sold") + theme_minimal()
+p
+```
+
+
+```{r}
+
+num_jurors = 12
+
+p_guilty = 0.75
+
+p_innocent = 1 - p_guilty
+
+votes_to_convict = 9
+
+
+```
+
+```{r}
+votes = sample(c("Guilty", "Innocent"), num_jurors , replace = TRUE , prob = c(p_guilty,p_innocent))
+votes
+```
+```{r}
+
+p_convict_given_innocent = sum(dbinom(votes_to_convict:num_jurors, num_jurors,0.1))
+p_convict_given_innocent
+```
+```{r}
+p_confict_given_guilty = sum(dbinom(votes_to_convict:num_jurors, num_jurors, 0.8))
+p_confict_given_guilty
+```
+```{r}
+p_acquit_given_giulty = sum(dbinom(num_jurors:(votes_to_convict-1),num_jurors,0.2))
+p_acquit_given_giulty
+```
+```{r}
+
+p_acquit_given_innocent = sum(dbinom(num_jurors:(votes_to_convict-1), num_jurors,0.9))
+p_acquit_given_innocent
+```
+```{r}
+p_correct_decision = (p_confict_given_guilty * p_guilty) + (p_acquit_given_innocent * p_innocent)
+p_correct_decision
+```
+
